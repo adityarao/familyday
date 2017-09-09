@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head> 
+    <link rel="stylesheet" href="http://codemirror.net/lib/codemirror.css">
+    <script src="http://codemirror.net/lib/codemirror.js"></script>
+    <script src="http://codemirror.net/addon/mode/simple.js"></script>
+    <script src="http://codemirror.net/addon/edit/matchbrackets.js"></script>
+    <script src="http://codemirror.net/mode/javascript/javascript.js"></script>  
+	<title>Programmer</title>
+</head>
+<style> 
+	@namespace url(http://www.w3.org/1999/xhtml);
+	.CodeMirror {
+	    font-family:"Ubuntu Mono", monospace !important;
+	    font-size:18pt !important;
+	}
+	.CodeMirror { height: 100%; }
+	.button {
+	  display: inline-block;
+	  padding: 15px 25px;
+	  font-size: 24px;
+	  cursor: pointer;
+	  text-align: center;
+	  text-decoration: none;
+	  outline: none;
+	  color: #fff;
+	  background-color: #4CAF50;
+	  border: none;
+	  border-radius: 15px;
+	  box-shadow: 0 9px #999;
+	}	
+</style>
+<script type="text/javascript">
+	window.onload = function () {
+	CodeMirror.defineSimpleMode("iotcode", {
+	  start: [
+	    {regex: /"(?:[^\\]|\\.)*?(?:"|$)/, token: "string"},
+	    {regex: /(function)(\s+)([a-z$][\w$]*)/,
+	     token: ["keyword", null, "variable-2"]},
+	    {regex: /(?:STOP|START|LED|MOTOR|WAIT|GOTO|SOUND)\b/,
+	     token: "keyword"},
+	    {regex: /true|false|null|LEFT|RIGHT|ON|OFF|undefined/, token: "atom"},
+	    {regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i,
+	     token: "number"},
+	    {regex: /\/\/.*/, token: "comment"},
+	    {regex: /\/(?:[^\\]|\\.)*?\//, token: "variable-3"},
+	    {regex: /\/\*/, token: "comment", next: "comment"},
+	    {regex: /[-+\/*=<>!]+/, token: "operator"},
+	    {regex: /[\{\[\(]/, indent: true},
+	    {regex: /[\}\]\)]/, dedent: true},
+	    {regex: /[a-z$][\w$]*/, token: "variable"},
+	    {regex: /<</, token: "meta", mode: {spec: "xml", end: />>/}}
+	  ],
+	  comment: [
+	    {regex: /.*?\*\//, token: "comment", next: "start"},
+	    {regex: /.*/, token: "comment"}
+	  ],
+	  meta: {
+	    dontIndentStates: ["comment"],
+	    lineComment: "//"
+	  }
+	});    
+	var editableCodeMirror = CodeMirror.fromTextArea(document.getElementById('codesnippet_editable'), {
+	        mode: "iotcode",
+	        theme: "default",
+	        lineNumbers: true
+	    });
+	};
+</script>
+<body>
+<h1 align="center" style="font-family: Consolas, monaco, monospace;"> Welcome to IoT Programmer !</h1>
+
+<form action="/" method="post">
+  <br>
+  <div style="border: 2px;border-style: solid;">  
+	<textarea rows="20" cols="50" name="codesnippet_editable" id="codesnippet_editable"/>
+START
+ON LED 1
+WAIT 5
+ON LED 2
+WAIT 5
+ON LED 3
+WAIT 5
+ON LED 4
+MOTOR LEFT
+WAIT 5
+MOTOR RIGHT 
+WAIT 5
+STOP</textarea>
+	</div>
+	<br>
+  <button align="center" class="button" type="submit" value="Submit!"> Run my code !</button> <br>	
+  <br>
+<textarea readonly rows="10" style="font-family: Consolas, monaco, monospace;font-size:14pt;width:50%;border:2px;border-style:dashed;display: block;margin-left: auto;margin-right: auto;">
+No errors !
+</textarea>  
+</form> 
+</body>
+</html>
