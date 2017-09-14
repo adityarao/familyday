@@ -1,0 +1,212 @@
+<html>
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+  <script src="http://rawgit.com/rubaxa/Sortable/master/Sortable.js"></script>
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"> </script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <style>
+  #dropArea {
+    width: 500px;
+    height: auto;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid black;
+    min-height: 500px;
+  }
+
+  #controls {
+    padding: 10px;
+  }
+
+  .navbar-brand {
+    padding: 0px; /* firefox bug fix */
+    background-color: black;
+    width: 100%;
+  }
+  .navbar-brand>img {
+    height: 100%;
+    padding: 15px; /* firefox bug fix */
+    width: auto;
+  }
+
+  body {
+    padding: 20px;
+  }
+
+  .list-group-item {
+    cursor: move;
+    cursor: -webkit-grabbing;
+  }
+  </style>
+  <script>
+
+  // Made this SYNC as thinger was acting up when sending multiple AJAX msgs and also ensures sequential execution
+  // Promises were blocking up thinger too. 
+  var DEFAULT_REPEAT_COUNT = 20;
+  function sendToServer(command) {
+    return $.ajax({
+      url: 'https://api.thinger.io/v2/users/gnanaswaroop/devices/iot_crane/' + command,
+      type: 'POST',
+      headers: {
+        'Authorization': '<REPLACE WITH THINGER AUTH TOKEN>',
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify({'in':'true'}),
+      dataType: 'json',
+      async: false,
+      onSuccess: function() {
+        console.log('AJAX call done success');
+      },
+      onFailure: function(err) {
+        console.log('AJAX call done failure - ' + JSON.stringify(err));
+      }
+    });
+  }
+
+  function baseLeft() {
+    return sendToServer('crane_base_left');
+  }
+
+  function baseRight() {
+    return sendToServer('crane_base_right');
+  }
+
+  function handLeft() {
+    return sendToServer('crane_hand_left');
+  }
+
+  function handRight() {
+    return sendToServer('crane_hand_right');
+  }
+
+  function resetCrane() {
+    return sendToServer('reset_crane');
+  }
+
+  function magnetOn() {
+    return sendToServer('magnet_on');
+  }
+
+  function magnetOff() {
+    return sendToServer('magnet_off');
+  }
+
+  function repeatExecute(functionReference, count) {
+    var i = 0;
+    while(i++ <count) {
+      console.log('chaining i = ' + i);
+      functionReference();
+    }
+  }
+
+  function baseRightFF() {
+    repeatExecute(baseRight, DEFAULT_REPEAT_COUNT-5);
+  }
+
+  function baseLeftFF() {
+    repeatExecute(baseLeft, DEFAULT_REPEAT_COUNT);
+  }
+
+  function handLeftFF() {
+    repeatExecute(handLeft, DEFAULT_REPEAT_COUNT);
+  }
+
+  function handRightFF() {
+    repeatExecute(handRight, DEFAULT_REPEAT_COUNT);
+  }
+
+  function executeSteps() {
+    updateStatus('Playing');
+    $('#dropArea').children('div').each(function () {
+        this.onclick();
+    });
+    updateStatus('Execution Complete');
+  }
+
+  function resetSteps() {
+    $('#dropArea').html('');
+    updateStatus('Get Ready to Code');
+  }
+
+  function updateStatus(statusText) {
+    $('#executionStatus').text(statusText);
+  }
+
+  $(document).ready(function() {
+
+    Sortable.create(controls, {
+      animation: 200,
+      group: {
+        name: "shared",
+        pull: "clone",
+        revertClone: true,
+      },
+      sort: true
+    });
+
+    Sortable.create(dropArea, {
+      group: "shared",
+      sort: false
+    });
+
+    updateStatus('Get Ready to Code');
+  });
+  </script>
+</head>
+<body>
+  <div>
+    <p/>
+    <ul class="nav nav-tabs">
+      <li class="active"><a data-toggle="tab" href="#manual">Manual</a></li>
+      <li><a data-toggle="tab" href="#code">Code</a></li>
+    </ul>
+    <div class="tab-content">
+      <div id="manual" class="tab-pane fade in active" align="center">
+        <p>
+          <a href="javascript:handRightFF()"><img src="up-ff.png"/></a>
+          <a href="javascript:handRight()"><img src="up.png"/></a>
+        </p>
+        <p>
+          <a href="javascript:baseRightFF()"><img src="left-ff.png"/></a>
+          <a href="javascript:baseRight()"><img src="left.png"/></a>
+          <a href="javascript:baseLeft()"><img src="right.png"/></a>
+          <a href="javascript:baseLeftFF()"><img src="right-ff.png"/></a>
+        </p>
+        <p>
+          <a href="javascript:handLeftFF()"><img src="down-ff.png"/></a>
+          <a href="javascript:handLeft()"><img src="down.png"/></a>
+        </p>
+        <p>
+          <a href="javascript:magnetOn()"><img src="magnet-on.png"/></a>
+          &nbsp;
+          <a href="javascript:magnetOff()"><img src="magnet-off.png"/></a>
+        </p>
+        <p>
+          <a href="javascript:resetCrane()"><img src="reset.png"/></a>
+        </p>
+      </div>
+      <div id="code" class="tab-pane fade">
+        <div class="row" align="center">
+          <div class="col-sm-6 list-group" id="controls">
+              <div class="list-group-item" onClick="javascript:handRightFF()"><img src="small/up-ff.png"/></a></div>
+              <div class="list-group-item" onClick="javascript:baseRightFF()"><img src="small/left-ff.png"/></a></div>
+              <div class="list-group-item" onClick="javascript:baseLeftFF()"><img src="small/right-ff.png"/></a></div>
+              <div class="list-group-item" onClick="javascript:handLeftFF()"><img src="small/down-ff.png"/></a></div>
+              <div class="list-group-item" onClick="javascript:magnetOn()"><img src="small/magnet-on.png"/></a></div>
+              <div class="list-group-item" onClick="javascript:magnetOff()"><img src="small/magnet-off.png"/></a></div>
+              <div class="list-group-item" onClick="javascript:resetCrane()"><img src="small/reset.png"/></a></div>
+              <hr/>
+              <button type="button" class="btn btn-primary btn-lg" onClick="executeSteps()">Play</button>
+              <button type="button" class="btn btn-primary btn-lg" onClick="resetSteps()">Reset</button>
+              <hr/>
+              <span id="executionStatus"></span>
+          </div>
+          <div class="col-sm-4 list-group" id="dropArea">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
