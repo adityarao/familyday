@@ -20,7 +20,7 @@ void LedMatrix::init() {
     
     SPI.begin ();
     SPI.setDataMode(SPI_MODE0);
-    SPI.setClockDivider(SPI_CLOCK_DIV128);
+    SPI.setClockDivider(SPI_CLOCK_DIV32);
     //SPI.setBitOrder(LSBFIRST);
     for(byte device = 0; device < myNumberOfDevices; device++) {
         sendByte (device, MAX7219_REG_SCANLIMIT, 7);   // show all 8 digits
