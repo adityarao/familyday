@@ -2,8 +2,8 @@
 #include <ESP8266WebServer.h>
 #include <Servo.h>
 
-#define ssid  "CreatorCon17"
-#define password "$ervicenow!23"
+#define ssid  ""
+#define password "$23"
 
 #define MAX_LEDS 6
 #define MAX_WAIT 20
